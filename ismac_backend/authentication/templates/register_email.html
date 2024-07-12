@@ -1,0 +1,31 @@
+<!-- TAZI ALI24921
+Votre identifiant ISMAC est: TA24921
+Votre demande de candidature au concours d'accès en 1 ère année de licence des études fondamentales dans les disciplines:
+Développement et Gestion pour l'année universitaire 2023-2024 a bien été enregistrée.
+Voici votre compte pour faire le suivi - Login :
+TA24921 - Mot de passe : TA24921
+Les résultats des présélections seront affichés sur le site internet www.ismac.ac.ma et au siège de l'ISMAC.
+Veuillez imprimer cet e-mail et le ramener le jour de l'examen.
+L'inscription au concours faite le : 28/07/2023 21:32 -->
+<html>
+  <head>
+    <title>ISMAC - Inscription au concours</title>
+  </head>
+  <body>
+    <p>
+      <strong>Bonjour {{ first_name }} {{ last_name }},</strong><br />
+      Votre identifiant ISMAC est: {{ email }}<br />
+      Votre demande de candidature au concours d'accès en 1 ère année de licence
+      des études fondamentales dans les disciplines:<br />
+      <!-- {{ user.speciality }} pour l'année universitaire {{ user.academic_year
+      }} a bien été enregistrée.<br /> -->
+      Voici votre compte pour faire le suivi - Login :<br />
+      {{ email }} - Mot de passe : {{ password }}<br />
+      Les résultats des présélections seront affichés sur le site internet
+      <a href="http://www.ismac.ac.ma">www.ismac.ma</a> et au siège de
+      l'ISMAC.<br />
+      Veuillez imprimer cet e-mail et le ramener le jour de l'examen.<br />
+      L'inscription au concours faite le : {{ created_at }}
+    </p>
+  </body>
+</html>
