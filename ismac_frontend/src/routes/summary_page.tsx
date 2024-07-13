@@ -26,7 +26,7 @@ function PortfolioUpdatePage() {
     setIsSubmitting(true);
     try {
       await axios.post(
-        rootUrl + "/students/" + user.id + "/files/",
+        rootUrl + "students/" + user.id + "/files/",
         {
           portfolio_file: portfolioFile,
         },

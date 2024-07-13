@@ -270,7 +270,7 @@ export function PreInscriptionPage() {
       );
       const id = res.data.id;
       await axios.post(
-        rootUrl + "/students/" + id + "/files/",
+        rootUrl + "students/" + id + "/files/",
         {
           cin_file: formData.cinFile,
           condidatureFile: bacFormData.condidatureFile,
