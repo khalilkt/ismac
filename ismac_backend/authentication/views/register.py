@@ -41,7 +41,7 @@ def send_user_register_email(user : User, student_data : StudentData,  password)
         subject=subject,
         body=plain_message,
         from_email=None,
-        to= ["mohamedkhalilkt@gmail.com"]
+        to= [user.email ]
     )
 
     message.attach_alternative(html_message, "text/html")

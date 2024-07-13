@@ -338,7 +338,7 @@ export function PreInscriptionPage() {
           <LogoutButton />
         </MDiv>
       )}
-      {step !== "done" && (
+      {/* {step !== "done" && (
         <OutlinedButton
           onClick={() => {
             fillDummyData();
@@ -346,7 +346,7 @@ export function PreInscriptionPage() {
         >
           DUMMY DATA
         </OutlinedButton>
-      )}
+      )} */}
       {step === "personal_informations" && (
         <PersonalInformationForm
           formData={formData}
