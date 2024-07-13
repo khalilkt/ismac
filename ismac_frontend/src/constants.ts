@@ -1,1 +1,3 @@
-export const rootUrl = false ? "" : "http://localhost:8000/";
+export const rootUrl = true
+  ? "https://inscription-ismac.ma:81/"
+  : "http://localhost:8000/";
