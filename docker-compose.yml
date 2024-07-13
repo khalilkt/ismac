@@ -46,8 +46,8 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=TRESOR_DB
-      - POSTGRES_USER=IMZ
+      - POSTGRES_DB=ISMAC_DB
+      - POSTGRES_USER=UUSR
       - POSTGRES_PASSWORD=aoishdqiwuf13213edn1i21x012u09x12ue28e12837eds128
       - PGDATA=/var/lib/postgresql/data/
     volumes:

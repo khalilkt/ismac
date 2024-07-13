@@ -2,11 +2,11 @@ FROM node:21-alpine3.18 as build
 
 WORKDIR /react
 
-COPY ./tresor_frontend/package*.json ./
+COPY ./ismac_frontend/package*.json ./
 
 RUN npm install
 
-COPY ./tresor_frontend .
+COPY ./ismac_frontend .
 
 RUN npm run build
 
