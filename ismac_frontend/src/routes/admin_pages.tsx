@@ -72,6 +72,7 @@ function formatDate(date: string) {
 }
 
 function formatDownloadLink(url: string) {
+  if (!url) return url;
   if (rootUrl.startsWith("https")) {
     url = url.replace("http://", "https://");
   }
