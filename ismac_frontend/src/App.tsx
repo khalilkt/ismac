@@ -15,8 +15,11 @@ import axios from "axios";
 import { rootUrl } from "./constants";
 import { LoadingIcon } from "./comps/icons";
 import { SummaryPage } from "./routes/summary_page";
+import { AdminLayout, ProtectedLayout } from "./routes/protected_layouts";
+import { AdminListPage } from "./routes/admin_pages";
 
 export interface StudentDataInterface {
+  id: number;
   first_name: string;
   last_name: string;
   cin: string;
@@ -35,28 +38,22 @@ export interface StudentDataInterface {
   filiere: string;
 
   portfolio_file: string | null;
+
+  created_at: string;
+  email: string;
 }
 export interface UserInterface {
   id: number;
   name: string;
   email: string;
   student_data: StudentDataInterface;
+  is_admin: boolean;
+  created_at: string;
 }
 
 export interface AuthData {
   token: string;
   user: UserInterface;
-}
-
-function ProtectedLayout({ shouldBeLogged }: { shouldBeLogged: boolean }) {
-  const authContext = React.useContext(AuthContext);
-  if (authContext.authData === null && shouldBeLogged) {
-    return <Navigate to="/" />;
-  }
-  if (authContext.authData !== null && !shouldBeLogged) {
-    return <Navigate to="/" />;
-  }
-  return <Outlet />;
 }
 
 export const AuthContext = React.createContext<{
@@ -139,18 +136,57 @@ function App() {
           </div>
         ) : (
           <Routes>
-            {authData ? (
-              <Route path="/" element={<SummaryPage />} />
-            ) : (
-              <Route path="/" element={<LoginPage />} />
-            )}
             <Route
               path="/"
-              element={<ProtectedLayout shouldBeLogged={false} />}
+              element={
+                <ProtectedLayout shouldBeLogged={false} isAdmin={false} />
+              }
             >
+              <Route path="/" element={<LoginPage />} />
               <Route path="/preinscription" element={<PreInscriptionPage />} />
             </Route>
+
+            <Route
+              path="/resume"
+              element={
+                <ProtectedLayout shouldBeLogged={true} isAdmin={false} />
+              }
+            >
+              <Route path="/resume" element={<SummaryPage />} />
+            </Route>
+
+            <Route
+              path="/"
+              element={<ProtectedLayout shouldBeLogged={true} isAdmin={true} />}
+            >
+              <Route
+                key="ecrit"
+                id="ecrit"
+                path="/admin/ecrit"
+                element={<AdminListPage type="ecrit" />}
+              />
+              <Route
+                key="oral"
+                id="oral"
+                path="/admin/oral"
+                element={<AdminListPage type="oral" />}
+              />
+              <Route path="*" element={<Navigate to="/admin/ecrit" />} />
+            </Route>
           </Routes>
+          // <Routes>
+          //   {authData  ? (
+          //     <Route path="/" element={<SummaryPage />} />
+          //   ) : (
+          //     <Route path="/" element={<LoginPage />} />
+          //   )}
+          //   <Route
+          //     path="/"
+          //     element={<ProtectedLayout shouldBeLogged={false} />}
+          //   >
+          //     <Route path="/preinscription" element={<PreInscriptionPage />} />
+          //   </Route>
+          // </Routes>
         )}
       </AuthContext.Provider>
     </BrowserRouter>

@@ -1,4 +1,5 @@
 import random
+import string
 from rest_framework.generics import CreateAPIView, ListCreateAPIView, ListAPIView
 from authentication.models import UserSerializer , User, StudentDataSerializer
 from rest_framework.permissions import AllowAny
@@ -6,6 +7,7 @@ from rest_framework import serializers
 from authentication.models import StudentData
 from django.db import transaction
 from rest_framework.views import APIView, Response
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
@@ -59,7 +61,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         student_data = validated_data.pop('student_data')
+        student_data.pop('is_accepted', None)
         password = self.generate_password(student_data.get('first_name'), student_data.get('last_name'))
+        print(password)
+        # aksmd_mkamsdk_8540
+        # adamsdma@gmail.com
         with transaction.atomic():
             user = User.objects.create_user(**validated_data, password=password)
             student_data = StudentData.objects.create(user=user, **student_data)
@@ -101,12 +107,52 @@ class StudentFilesUpload(APIView):
             student_data.save()
         return Response({"message" : "Files uploaded"})
         
-
 class StudentListView(ListAPIView):
+    serializer_class = StudentDataSerializer
+    permission_classes = [IsAdminUser]
+    search_fields = ['first_name', 'last_name', 'cin', "phone", "codeMassar"]
+    required_query_params = {
+        "type" : ["oral", "ecrit"],
+    }
     
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
-    queryset = User.objects.all()
-
-
+    def get(self, request, *args, **kwargs):
+        for key in self.required_query_params:
+            if key not in request.query_params:
+                return Response({"message" : f"{key} is required"})
+            if request.query_params[key] not in self.required_query_params[key]:
+                return Response({"message" : f"{key} must be in {self.required_query_params[key]}"})
+        return super().get(request, *args, **kwargs)
     
+    def filter_queryset(self, queryset):
+        type = self.request.query_params.get('type')
+        if type == "oral":
+            queryset = queryset.filter(is_accepted=True)
+        # elif type == "ecrit":
+            # queryset = queryset
+        ret =  super().filter_queryset(queryset)
+        return ret
+    def get_queryset(self):
+        # students = StudentData.objects.filter(user__is_admin=False)
+        # for student in students:
+        #     code_massar = random.choice(string.ascii_uppercase) + ''.join(random.choices(string.digits, k=9))
+        #     student.codeMassar = code_massar
+        #     student.save()
+        return StudentData.objects.filter(user__is_admin=False)
+    
+class BulkAcceptStudents(APIView):
+    permission_classes = [IsAdminUser]
+    def post(self, request):
+        students = request.data.get('students')
+        students = [id.strip() for id in students]
+        if not students:
+            return Response({"message" : "students not found"})
+        StudentData.objects.filter(user__is_admin=False).exclude(codeMassar__in=students).update(is_accepted=False)
+        StudentData.objects.filter(user__is_admin=False).filter(codeMassar__in=students).update(is_accepted=True)
+        
+        return Response({"message" : "Students accepted"})
+    
+class BulkResetStudents(APIView):
+    permission_classes = [IsAdminUser]
+    def post(self, request):
+        StudentData.objects.filter(user__is_admin=False).update(is_accepted=None)
+        return Response({"message" : "Students reset"})

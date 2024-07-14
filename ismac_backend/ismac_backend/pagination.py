@@ -2,7 +2,7 @@ from rest_framework import pagination
 from rest_framework.response import Response
 
 class MPagePagination(pagination.PageNumberPagination):
-    page_size = 10 
+    page_size = 10
 
     def get_page_size(self, request):
         return self.page_size

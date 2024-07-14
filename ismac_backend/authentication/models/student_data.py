@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 
 class StudentData(models.Model):
-    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='student_data')
+    user = models.OneToOneField('User', on_delete=models.CASCADE, related_name='student_data')
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     cin = models.CharField(max_length=255)
@@ -28,8 +28,12 @@ class StudentData(models.Model):
 
     portfolio_file = models.FileField(null=True, blank=True)
 
+    is_accepted = models.BooleanField(null=True, blank=True, default=None)
+
 class StudentDataSerializer(serializers.ModelSerializer):
-    
+    created_at = serializers.DateTimeField( read_only=True, source="user.created_at")
+    email = serializers.EmailField(read_only=True, source="user.email")
+
     class Meta:
         model = StudentData
         fields = '__all__'

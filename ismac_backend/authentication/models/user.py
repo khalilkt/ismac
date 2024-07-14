@@ -51,6 +51,7 @@ class User(AbstractBaseUser):
 
 class UserSerializer(serializers.ModelSerializer): 
     student_data = serializers.SerializerMethodField()
+    
 
     def get_student_data(self, user):
         student_data = StudentData.objects.filter(user=user).first()

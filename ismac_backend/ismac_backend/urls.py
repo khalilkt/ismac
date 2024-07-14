@@ -26,10 +26,12 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path('auth/token/', LoginTokenView.as_view(), name="login-token"),
     path('auth/login/', LoginView.as_view(), name="login"),
-    path("send_mail/", SendMailView.as_view(), name="send_mail"),
+    # path("send_mail/", SendMailView.as_view(), name="send_mail"),
     path("register/", StudentRegisterView.as_view(), name="register"),
-    path("students/", StudentListView.as_view(), name="students"),
     path("students/<int:id>/files/", StudentFilesUpload.as_view(), name="student_files"),
+    path("students/", StudentListView.as_view(), name="students"),
+    path("students/accept/", BulkAcceptStudents.as_view(), name="accept_students"),
+    path("students/reset/", BulkResetStudents.as_view(), name="reject_students"),
 ]
 
 urlpatterns += static("" +  settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

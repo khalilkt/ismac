@@ -2,6 +2,7 @@ import React, { HtmlHTMLAttributes } from "react";
 import { ReactNode } from "react";
 import { AuthContext } from "../App";
 import logo from "../assets/images/logo text.png";
+import { LeftArrow } from "./icons";
 
 export function Input({
   ...inputProps
@@ -211,5 +212,63 @@ export function MDiv({
       {withLogo && <img src={logo} alt="logo" className="mb-8 w-[91px]" />}
       {divProps.children}
     </div>
+  );
+}
+
+export function Pagination({
+  onItemClick,
+  current,
+  total,
+  className = "",
+}: {
+  current: number;
+  total: number;
+  onItemClick: (page: number) => void;
+  className?: string;
+}) {
+  function Item({ page }: { page: number | null }) {
+    return (
+      <li
+        onClick={() => {
+          if (page) onItemClick(page);
+        }}
+        className={`border-lightGray flex h-10 cursor-pointer items-center justify-center border px-4 leading-tight text-black ${page === current ? "bg-lightGray" : "hover:bg-primaryLight"}`}
+      >
+        {page ?? "..."}
+      </li>
+    );
+  }
+
+  const firstPage = Math.max(1, current - 2);
+  const lastPage = Math.min(total, firstPage + 4);
+
+  return (
+    <ul
+      className={`inline-flex h-10 w-min -space-x-px self-center text-base font-medium ${className}`}
+    >
+      {current !== 1 && (
+        <li
+          onClick={() => {
+            onItemClick(current - 1);
+          }}
+          className="text-gray-500 border-lightGray hover:bg-lightGray ms-0 flex h-10 items-center justify-center rounded-s-lg border border-e-0 px-4 leading-tight"
+        >
+          <LeftArrow />
+        </li>
+      )}
+      {Array.from({ length: lastPage - firstPage + 1 }).map((_, i) => (
+        <Item key={i} page={firstPage + i} />
+      ))}
+      {current !== total && (
+        <li
+          onClick={() => {
+            onItemClick(current + 1);
+          }}
+          className="text-gray-500 border-lightGray hover:bg-lightGray ms-0 flex h-10 rotate-180 transform cursor-pointer items-center justify-center rounded-s-lg border border-e-0 px-4 leading-tight"
+        >
+          <LeftArrow />
+        </li>
+      )}
+    </ul>
   );
 }
