@@ -43,6 +43,17 @@ export function ValidationPage({
       <SubTitle className="mb-6 mt-3">
         Veuillez vérifer vos détails avant de créer votre compte.
       </SubTitle>
+      {finalForm.profile_picture && (
+        <div
+          className={`bg-gray-50 relative my-10 flex cursor-pointer items-center justify-center self-center rounded-full border-2 border-secondary bg-secondary bg-opacity-[8%]`}
+        >
+          <img
+            src={URL.createObjectURL(finalForm.profile_picture!)}
+            alt="Preview"
+            className={`${true ? "h-[120px] w-[120px]" : ""} rounded-full object-cover`}
+          />
+        </div>
+      )}
       <SummaryTable
         data={{
           "Nom Complet": finalForm.first_name + " " + finalForm.last_name,
