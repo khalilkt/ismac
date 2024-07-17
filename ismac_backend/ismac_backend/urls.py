@@ -33,6 +33,7 @@ urlpatterns = [
     path("students/accept/", BulkAcceptStudents.as_view(), name="accept_students"),
     path("students/reset/", BulkResetStudents.as_view(), name="reject_students"),
     path("students/data/", students_data, name="students_data"),
+    
 ]
 
 urlpatterns += static("" +  settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
