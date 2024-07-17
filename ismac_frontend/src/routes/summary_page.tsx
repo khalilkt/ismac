@@ -14,7 +14,7 @@ import React from "react";
 import axios from "axios";
 import { rootUrl } from "../constants";
 import { LoadingIcon } from "../comps/icons";
-const didOralStart = true;
+const Start = true;
 
 function PortfolioUpdatePage() {
   const authContext = useContext(AuthContext);
@@ -111,7 +111,21 @@ export function SummaryPage() {
   };
 
   const shouldUploadPortfolio =
-    didOralStart && user.student_data.portfolio_file === null;
+    user.student_data.is_accepted === true && !user.student_data.portfolio_file;
+
+  if (user.student_data.is_accepted === false) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <MDiv className="h-max lg:w-[600px]">
+          <Title>
+            Votre candidature a été rejetée. Merci pour votre participation.
+          </Title>
+          <LogoutButton className="mt-10" />
+        </MDiv>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`mx-auto flex h-screen w-full flex-col px-5 text-sm lg:w-[660px] lg:px-0 lg:text-base ${shouldUploadPortfolio ? "justify-center" : ""}`}
@@ -122,9 +136,13 @@ export function SummaryPage() {
         <>
           <img src={logo} alt="logo" className="mb-8 mt-16 w-[91px]" />
           <Title>Détails de votre Préinscription</Title>
+
           <SubTitle className="mb-9 mt-3">
-            Les épreuves orales ne sont pas encore commencée
+            {user.student_data.is_accepted !== null
+              ? ""
+              : "Les épreuves orales ne sont pas encore commencée"}
           </SubTitle>
+
           <SummaryTable data={data} />
           {user.student_data.portfolio_file && (
             <div

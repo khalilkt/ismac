@@ -12,6 +12,10 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
+import xlwt
+from django.http import HttpResponse
+from django.utils import timezone
+
 
 
 
@@ -88,14 +92,10 @@ class StudentFilesUpload(APIView):
         student_data = StudentData.objects.get(user=user)
         if not student_data:
             return Response({"message" : "Student data not found"})
-        cin_file = request.FILES.get('cin_file')
         condidatureFile = request.FILES.get('condidatureFile')
         profile_picture = request.FILES.get('profile_picture')
         portfolio_file = request.FILES.get('portfolio_file')
 
-        if cin_file and not student_data.cin_file:
-            student_data.cin_file = cin_file
-            student_data.save()
         if condidatureFile and not student_data.condidatureFile:
             student_data.condidatureFile = condidatureFile
             student_data.save()
@@ -110,7 +110,7 @@ class StudentFilesUpload(APIView):
 class StudentListView(ListAPIView):
     serializer_class = StudentDataSerializer
     permission_classes = [IsAdminUser]
-    search_fields = ['first_name', 'last_name', 'cin', "phone", "codeMassar"]
+    search_fields = ['first_name', 'last_name', 'cin',  "codeMassar", "user__email"]
     required_query_params = {
         "type" : ["oral", "ecrit"],
     }
@@ -142,8 +142,14 @@ class StudentListView(ListAPIView):
 class BulkAcceptStudents(APIView):
     permission_classes = [IsAdminUser]
     def post(self, request):
+
         students = request.data.get('students')
-        students = [id.strip() for id in students]
+        students = [id.strip().lower() for id in students]
+        for student in StudentData.objects.filter(user__is_admin=False):
+            student.codeMassar = student.codeMassar.lower()
+            student.save()
+        
+        
         if not students:
             return Response({"message" : "students not found"})
         StudentData.objects.filter(user__is_admin=False).exclude(codeMassar__in=students).update(is_accepted=False)
@@ -156,3 +162,43 @@ class BulkResetStudents(APIView):
     def post(self, request):
         StudentData.objects.filter(user__is_admin=False).update(is_accepted=None)
         return Response({"message" : "Students reset"})
+    
+
+def format_datetime(date):
+    return date.strftime("%Y-%m-%d %H:%M:%S")
+
+def students_data(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="Liste des etudiants.xls"'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Liste des étudiants')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    columns = ['Nom', 'Prénom', 'CIN', 'Nationalité', 'Ville', 'Date de naissance', 'Téléphone', 'Adresse', 'Code Massar', 'Type de bac', 'Année de bac', 'Note de bac', 'Département', 'Filière', "email", "Date d'inscription"]
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+    font_style = xlwt.XFStyle()
+    students = StudentData.objects.filter(user__is_admin=False)
+    for student in students:
+        row_num += 1
+        ws.write(row_num, 0, student.first_name, font_style)
+        ws.write(row_num, 1, student.last_name, font_style)
+        ws.write(row_num, 2, student.cin, font_style)
+        ws.write(row_num, 3, student.nationality, font_style)
+        ws.write(row_num, 4, student.city, font_style)
+        ws.write(row_num, 5, student.date_of_birth, font_style)
+        ws.write(row_num, 6, student.phone, font_style)
+        ws.write(row_num, 7, student.address, font_style)
+        ws.write(row_num, 8, student.codeMassar, font_style)
+        ws.write(row_num, 9, student.bac_type, font_style)
+        ws.write(row_num, 10, student.bac_year, font_style)
+        ws.write(row_num, 11, student.bac_note, font_style)
+        ws.write(row_num, 12, student.departement, font_style)
+        ws.write(row_num, 13, student.filiere, font_style)
+        ws.write(row_num, 14, student.user.email, font_style)
+        ws.write(row_num, 15, format_datetime(student.user.created_at), font_style)
+    wb.save(response)
+    return response
+

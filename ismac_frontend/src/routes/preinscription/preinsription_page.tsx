@@ -35,7 +35,7 @@ import { rootUrl } from "../../constants";
 type PageStep =
   | "personal_informations"
   | "bac_informations"
-  | "final_informations"
+  // | "final_informations"
   | "validation"
   | "done";
 
@@ -48,7 +48,6 @@ export function PreInscriptionPage() {
     first_name: "",
     last_name: "",
     cin: "",
-    cinFile: null,
     nationality: "",
     city: "",
     date_of_birth: "",
@@ -62,7 +61,6 @@ export function PreInscriptionPage() {
     first_name: "",
     last_name: "",
     cin: "",
-    cinFile: "",
     nationality: "",
     city: "",
     date_of_birth: "",
@@ -78,6 +76,7 @@ export function PreInscriptionPage() {
     bac_year: "",
     bac_note: "",
     condidatureFile: null,
+    is_foreign_bac: false,
   });
 
   const [bacErrors, setBacErrors] = useState({
@@ -86,11 +85,12 @@ export function PreInscriptionPage() {
     bac_year: "",
     bac_note: "",
     condidatureFile: "",
+    is_foreign_bac: "",
   });
 
   const [finalForm, setFinalForm] = useState({
-    departement: "",
-    filiere: "",
+    departement: "--",
+    filiere: "--",
   });
   const [finalErros, setFinalErros] = useState({
     departement: "",
@@ -108,7 +108,6 @@ export function PreInscriptionPage() {
       email: "",
       phone: "",
       address: "",
-      cinFile: "",
       profile_picture: "",
     });
     setBacErrors({
@@ -117,6 +116,7 @@ export function PreInscriptionPage() {
       bac_year: "",
       bac_note: "",
       condidatureFile: "",
+      is_foreign_bac: "",
     });
     setFinalErros({
       departement: "",
@@ -137,14 +137,6 @@ export function PreInscriptionPage() {
             [fieldName]: "Ce champ est requis",
           }));
           isGood = false;
-        } else if (fieldName === "cinFile") {
-          if (!formData.cinFile) {
-            setErrors((prev) => ({
-              ...prev,
-              [fieldName]: "Veuillez ajouter un fichier",
-            }));
-            isGood = false;
-          }
         } else if (fieldName === "profile_picture") {
           if (!formData.profile_picture) {
             setErrors((prev) => ({
@@ -222,6 +214,13 @@ export function PreInscriptionPage() {
             }));
             isGood = false;
           }
+          if (parseFloat(bacFormData.bac_note) < 12) {
+            setBacErrors((prev) => ({
+              ...prev,
+              [fieldName]: "Note inférieure à 12",
+            }));
+            isGood = false;
+          }
         } else if (fieldName === "condidatureFile") {
           if (!bacFormData.condidatureFile) {
             setBacErrors((prev) => ({
@@ -232,17 +231,18 @@ export function PreInscriptionPage() {
           }
         }
       }
-    } else if (step === "final_informations") {
-      for (const fieldName in finalForm) {
-        if (finalForm[fieldName as keyof typeof finalForm] === "") {
-          setFinalErros((prev) => ({
-            ...prev,
-            [fieldName]: "Ce champ est requis",
-          }));
-          isGood = false;
-        }
-      }
     }
+    // else if (step === "final_informations") {
+    //   for (const fieldName in finalForm) {
+    //     if (finalForm[fieldName as keyof typeof finalForm] === "") {
+    //       setFinalErros((prev) => ({
+    //         ...prev,
+    //         [fieldName]: "Ce champ est requis",
+    //       }));
+    //       isGood = false;
+    //     }
+    //   }
+    // }
 
     return isGood;
   }
@@ -256,7 +256,6 @@ export function PreInscriptionPage() {
           student_data: {
             ...finalForm,
             condidatureFile: null,
-            cinFile: null,
             profile_picture: null,
           },
           name: finalForm.first_name + " " + finalForm.last_name,
@@ -272,7 +271,6 @@ export function PreInscriptionPage() {
       await axios.post(
         rootUrl + "students/" + id + "/files/",
         {
-          cin_file: formData.cinFile,
           condidatureFile: bacFormData.condidatureFile,
           profile_picture: formData.profile_picture,
         },
@@ -303,7 +301,6 @@ export function PreInscriptionPage() {
       email: "example" + randomNumber.toString() + "@example.com",
       phone: "+1234567890",
       address: "123 Main St",
-      cinFile: null,
       profile_picture: null,
     });
     setBacFormData({
@@ -312,6 +309,7 @@ export function PreInscriptionPage() {
       bac_year: "2020",
       bac_note: "18.5",
       condidatureFile: null,
+      is_foreign_bac: false,
     });
     setFinalForm({
       departement: "Computer Science",
@@ -332,7 +330,7 @@ export function PreInscriptionPage() {
           <div className="mb-10 font-light">
             Nous avons envoyé un e-mail à{" "}
             <span className="font-semibold">{formData.email + " "}</span>avec
-            votre mot de passe et votre convocation
+            votre mot de passe
           </div>
           <hr className="mb-6 border-gray" />
           <LogoutButton />
@@ -363,13 +361,13 @@ export function PreInscriptionPage() {
           // onErrorChange={setBacErrors}
         />
       )}
-      {step === "final_informations" && (
+      {/* {step === "final_informations" && (
         <FinalInformationsForm
           formData={finalForm}
           onChange={setFinalForm}
           errors={finalErros}
         />
-      )}
+      )} */}
       {step === "validation" && (
         <ValidationPage
           finalForm={{
@@ -403,10 +401,10 @@ export function PreInscriptionPage() {
                   window.location.href = "/";
                   return;
                 }
-                let prevStep = undefined;
-                if (step === "validation") prevStep = "final_informations";
-                else if (step === "final_informations")
-                  prevStep = "bac_informations";
+                let prevStep: PageStep | undefined = undefined;
+                if (step === "validation") prevStep = "bac_informations";
+                // else if (step === "final_informations")
+                //   prevStep = "bac_informations";
                 else if (step === "bac_informations")
                   prevStep = "personal_informations";
 
@@ -435,14 +433,15 @@ export function PreInscriptionPage() {
                   return;
                 }
 
-                let nextStep = undefined;
+                let nextStep: PageStep | undefined = undefined;
                 if (step === "personal_informations") {
                   nextStep = "bac_informations";
                 } else if (step === "bac_informations") {
-                  nextStep = "final_informations";
-                } else if (step === "final_informations") {
                   nextStep = "validation";
                 }
+                // else if (step === "final_informations") {
+                //   nextStep = "validation";
+                // }
 
                 setStep(nextStep as PageStep);
                 window.scrollTo(0, 0);
@@ -451,7 +450,7 @@ export function PreInscriptionPage() {
               {isSubmitting ? (
                 <LoadingIcon className="mx-auto stroke-white" />
               ) : step === "validation" ? (
-                "Créer un compte"
+                "Valider"
               ) : (
                 "Suivant"
               )}

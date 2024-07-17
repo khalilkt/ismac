@@ -31,7 +31,7 @@ export function LoginPage() {
           <img src={logo} alt="logo" className="mt-16 w-[91px]" />
         </div>
 
-        <Title>Plateforme de candidature Formation initiale</Title>
+        <Title>Plate-forme de candidature Formation initiale</Title>
         <SubTitle>Connectez-vous à votre compte ci-dessous</SubTitle>
 
         <Labeled label="Email" className="mt-6">

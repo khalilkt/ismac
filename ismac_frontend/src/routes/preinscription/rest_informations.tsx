@@ -1,7 +1,9 @@
-import { Input, SubTitle, Title } from "../../comps/comps";
+import { useState } from "react";
+import { Input, Select, SubTitle, Title } from "../../comps/comps";
 import { ErrorMessage, FileInput, Labeled } from "../../comps/form_comps";
 
 export interface BacInformationFormInterface {
+  is_foreign_bac: boolean;
   codeMassar: string;
   bac_type: string;
   bac_year: string;
@@ -9,11 +11,29 @@ export interface BacInformationFormInterface {
   condidatureFile: File | null;
 }
 
+const BAC_TYPES = [
+  "Sciences Chariaa",
+  "Langue Arabe",
+  "Lettres",
+  "Sciences Humaines",
+  "Sciences Economiques",
+  "Sciences de Gestion et Comptabilité",
+  "Arts Appliqués",
+  "Sciences de la vie et de la terre",
+  "Sciences physique chimie",
+  "Sciences Agronomiques",
+  "Sciences Mathématiques A",
+  "Sciences Mathématiques B",
+  "Sciences et Technologies Electrique",
+  "Sciences et Technologies Mécanique",
+];
+
 export type BacInformationFormErrors = Omit<
   BacInformationFormInterface,
-  "condidatureFile"
+  "condidatureFile" | "is_foreign_bac"
 > & {
   condidatureFile: string;
+  is_foreign_bac: string;
 };
 
 export function BacInformationsForm({
@@ -26,6 +46,8 @@ export function BacInformationsForm({
   errors: BacInformationFormErrors;
   //   onErrorChange: (errors: BacInformationFormErrors) => void;
 }) {
+  const [isCustomBacType, setIsCustomBacType] = useState(false);
+
   return (
     <>
       <Title>Préinscription - Informations Baccalauréat</Title>
@@ -33,9 +55,35 @@ export function BacInformationsForm({
         Veuillez entrer vos détails pour créer votre compte de candidature.
       </SubTitle>
       <div className="mt-8 grid grid-cols-1 gap-x-4 gap-y-6">
-        <Labeled label="Code Massar" className="col-span-1">
+        <Labeled label="Bac étranger" className="col-span-1">
+          <Select
+            className="text-lg"
+            value={formData.is_foreign_bac ? "oui" : "non"}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                is_foreign_bac: e.target.value === "oui",
+              })
+            }
+          >
+            <option value="oui">Oui</option>
+            <option value="non">Non</option>
+          </Select>
+        </Labeled>
+        <Labeled
+          label={
+            formData.is_foreign_bac
+              ? "Référence du baccalauréat"
+              : "Code Massar"
+          }
+          className="col-span-1"
+        >
           <Input
-            placeholder="Entrez votre code Massar"
+            placeholder={
+              formData.is_foreign_bac
+                ? "Entrez la référence de votre baccalauréat"
+                : "Entrez votre code Massar"
+            }
             className="text-lg"
             value={formData.codeMassar}
             onChange={(e) =>
@@ -47,30 +95,58 @@ export function BacInformationsForm({
           )}
         </Labeled>
         <Labeled label="Type de baccalauréat" className="col-span-1">
-          <Input
-            placeholder="Entrez votre type de baccalauréat"
-            className="text-lg"
-            value={formData.bac_type}
-            onChange={(e) =>
-              setFormData({ ...formData, bac_type: e.target.value })
-            }
-          />
+          {isCustomBacType ? (
+            <Input
+              placeholder="Entrez le type de votre baccalauréat"
+              className="text-lg"
+              value={formData.bac_type}
+              onChange={(e) =>
+                setFormData({ ...formData, bac_type: e.target.value })
+              }
+            />
+          ) : (
+            <Select
+              value={formData.bac_type}
+              onChange={(e) => {
+                if (e.target.value === "OTHER") {
+                  setIsCustomBacType(true);
+                  setFormData({ ...formData, bac_type: "" });
+                  return;
+                }
+                setFormData({ ...formData, bac_type: e.target.value });
+              }}
+            >
+              <option value="" disabled>
+                Sélectionnez un type de baccalauréat
+              </option>
+              {BAC_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+              <option value="OTHER">Autre</option>
+            </Select>
+          )}
           {errors.bac_type && <ErrorMessage>{errors.bac_type}</ErrorMessage>}
         </Labeled>
         <Labeled label="Année du baccalauréat" className="col-span-1">
-          <Input
-            placeholder="Entrez votre année de Babaccalauréatc"
-            className="text-lg"
+          <Select
             value={formData.bac_year}
             onChange={(e) =>
               setFormData({ ...formData, bac_year: e.target.value })
             }
-          />
+          >
+            <option value="" disabled>
+              Sélectionnez l'année de votre baccalauréat
+            </option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+          </Select>
           {errors.bac_year && <ErrorMessage>{errors.bac_year}</ErrorMessage>}
         </Labeled>
-        <Labeled label="Note de Bac" className="col-span-1">
+        <Labeled label="Moyenne générale" className="col-span-1">
           <Input
-            placeholder="Entrez votre note de Bac"
+            placeholder="Entrez votre moyenne générale"
             className="text-lg"
             max={20}
             min={0}
@@ -91,6 +167,9 @@ export function BacInformationsForm({
         <Labeled label="Fichier de condidature" className="col-span-1">
           <FileInput
             type="file"
+            accept=".zip"
+            note="Un fichier compressé (zip, rar) avec des pièces format PDF ou JPEG, taille maximale : 3Mo"
+            maxSize={3 * 1024}
             file={formData.condidatureFile}
             error={errors.condidatureFile}
             onChange={(e) =>

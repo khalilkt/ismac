@@ -9,7 +9,6 @@ class StudentData(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     cin = models.CharField(max_length=255)
-    cin_file = models.FileField(null=True, blank=True)
     nationality = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     date_of_birth = models.DateField()
@@ -17,6 +16,7 @@ class StudentData(models.Model):
     address = models.CharField(max_length=255)
     profile_picture = models.FileField(null=True, blank=True)
 
+    is_foreign_bac = models.BooleanField()
     codeMassar = models.CharField(max_length=255)
     bac_type = models.CharField(max_length=255)
     bac_year = models.CharField(max_length=255)

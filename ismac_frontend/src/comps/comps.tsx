@@ -13,7 +13,7 @@ export function Input({
   return (
     <input
       {...inputProps}
-      className={`rounded-md border border-gray px-3 py-3 text-sm font-light text-black lg:text-base ${inputProps.className ?? ""}`}
+      className={`rounded-md border border-gray px-3 py-3 text-sm font-light text-black disabled:bg-red-50 disabled:text-gray lg:text-base ${inputProps.className ?? ""}`}
     />
   );
 }
@@ -27,7 +27,7 @@ export function Select({
   return (
     <select
       {...selectedProps}
-      className={`border-primaryBorder relative h-full w-full text-ellipsis rounded-md border px-3 py-2 text-sm text-black lg:text-base ${selectedProps.className ?? ""}`}
+      className={`rounded-md border border-gray px-3 py-3 text-sm font-light text-black lg:text-base`}
     >
       {children}
     </select>
@@ -232,7 +232,7 @@ export function Pagination({
         onClick={() => {
           if (page) onItemClick(page);
         }}
-        className={`border-lightGray flex h-10 cursor-pointer items-center justify-center border px-4 leading-tight text-black ${page === current ? "bg-lightGray" : "hover:bg-primaryLight"}`}
+        className={`flex h-10 cursor-pointer items-center justify-center border border-lightGray px-4 leading-tight text-black ${page === current ? "bg-lightGray" : "hover:bg-primaryLight"}`}
       >
         {page ?? "..."}
       </li>
@@ -251,7 +251,7 @@ export function Pagination({
           onClick={() => {
             onItemClick(current - 1);
           }}
-          className="text-gray-500 border-lightGray hover:bg-lightGray ms-0 flex h-10 items-center justify-center rounded-s-lg border border-e-0 px-4 leading-tight"
+          className="text-gray-500 ms-0 flex h-10 items-center justify-center rounded-s-lg border border-e-0 border-lightGray px-4 leading-tight hover:bg-lightGray"
         >
           <LeftArrow />
         </li>
@@ -264,7 +264,7 @@ export function Pagination({
           onClick={() => {
             onItemClick(current + 1);
           }}
-          className="text-gray-500 border-lightGray hover:bg-lightGray ms-0 flex h-10 rotate-180 transform cursor-pointer items-center justify-center rounded-s-lg border border-e-0 px-4 leading-tight"
+          className="text-gray-500 ms-0 flex h-10 rotate-180 transform cursor-pointer items-center justify-center rounded-s-lg border border-e-0 border-lightGray px-4 leading-tight hover:bg-lightGray"
         >
           <LeftArrow />
         </li>

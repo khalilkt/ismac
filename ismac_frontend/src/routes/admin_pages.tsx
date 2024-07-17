@@ -66,9 +66,9 @@ export function MDialog({
   );
 }
 
-function formatDate(date: string) {
+function formatDateTime(date: string) {
   const d = new Date(date);
-  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+  return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
 }
 
 function formatDownloadLink(url: string) {
@@ -269,7 +269,7 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
             });
           }}
         />
-        {type === "oral" && (
+        {type === "oral" ? (
           <button
             onClick={() => {
               setDialogOpen(true);
@@ -277,6 +277,18 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
             className="ml-4 rounded-lg bg-secondary px-4 py-2 text-white transition-all active:scale-90"
           >
             Ajouter
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              // rootUrl + "students/data/"
+              const url = rootUrl + "students/data/";
+              // just open the url in a new tab
+              window.open(url, "_blank");
+            }}
+            className="ml-4 rounded-lg bg-secondary px-4 py-2 text-white transition-all active:scale-90"
+          >
+            Imprimer
           </button>
         )}
       </div>
@@ -293,26 +305,23 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
                 <th className="border border-gray px-4 py-2 font-normal">
                   Date préinscription
                 </th>
-                <th className="w-[20%] border border-gray px-4 py-2 font-normal">
-                  Nom Complet
+                <th className="border border-gray px-4 py-2 font-normal">
+                  Prénom
                 </th>
                 <th className="border border-gray px-4 py-2 font-normal">
-                  Date de naissance
+                  Nom
+                </th>
+                <th className="border border-gray px-4 py-2 font-normal">
+                  CIN
+                </th>
+                <th className="border border-gray px-4 py-2 font-normal">
+                  Email
                 </th>
                 <th className="border border-gray px-4 py-2 font-normal">
                   Code Massar
                 </th>
                 <th className="border border-gray px-4 py-2 font-normal">
-                  Branche
-                </th>
-                <th className="border border-gray px-4 py-2 font-normal">
-                  Année du Bac
-                </th>
-                <th className="border border-gray px-4 py-2 font-normal">
-                  Note du Bac
-                </th>
-                <th className="border border-gray px-4 py-2 font-normal">
-                  Filière
+                  Moyenne Gen
                 </th>
                 <th className="border border-gray px-4 py-2 font-normal">
                   {type === "ecrit" ? "Dossier" : "Portfolio"}
@@ -337,45 +346,57 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
                 data.data.map((student) => (
                   <tr key={student.id} className="border-b border-gray">
                     <td className="border border-gray px-4 py-2">
-                      {formatDate(student.created_at)}
+                      {formatDateTime(student.created_at)}
                     </td>
                     <td className="border border-gray px-4 py-2">
-                      {student.first_name} {student.last_name}
+                      {student.first_name}
                     </td>
                     <td className="border border-gray px-4 py-2">
-                      {student.date_of_birth}
+                      {student.last_name}
+                    </td>
+                    <td className="border border-gray px-4 py-2">
+                      {student.cin}
+                    </td>
+                    <td className="border border-gray px-4 py-2">
+                      {student.email}
                     </td>
                     <td className="border border-gray px-4 py-2">
                       {student.codeMassar}
                     </td>
                     <td className="border border-gray px-4 py-2">
-                      {student.departement}
-                    </td>
-                    <td className="border border-gray px-4 py-2">
-                      {student.bac_year}
-                    </td>
-                    <td className="border border-gray px-4 py-2">
                       {student.bac_note}
                     </td>
                     <td className="border border-gray px-4 py-2">
-                      {student.filiere}
-                    </td>
-                    <td className="border border-gray px-4 py-2">
-                      {
-                        <a
-                          href={formatDownloadLink(
-                            type === "ecrit"
-                              ? student.condidatureFile
-                              : student.portfolio_file ?? "",
-                          )}
-                          target="_blank"
-                          className="text-blue-500 underline"
-                        >
-                          {type === "ecrit"
-                            ? "Voir le dossier"
-                            : "Voir le portfolio"}
-                        </a>
-                      }
+                      {type === "ecrit" &&
+                        (student.condidatureFile ? (
+                          <a
+                            href={formatDownloadLink(student.condidatureFile)}
+                            target="_blank"
+                            className="text-blue-500 underline"
+                          >
+                            Voir le dossier
+                          </a>
+                        ) : (
+                          <span className="mx-auto text-center font-semibold">
+                            -
+                          </span>
+                        ))}
+                      {type === "oral" &&
+                        (student.portfolio_file ? (
+                          <a
+                            href={formatDownloadLink(
+                              student.portfolio_file ?? "",
+                            )}
+                            target="_blank"
+                            className="text-blue-500 underline"
+                          >
+                            Voir le portfolio
+                          </a>
+                        ) : (
+                          <span className="mx-auto text-center font-semibold">
+                            -
+                          </span>
+                        ))}
                     </td>
                   </tr>
                 ))}

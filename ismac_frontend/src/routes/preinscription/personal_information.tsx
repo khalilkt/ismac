@@ -20,7 +20,6 @@ export interface PersonalInformationFormInterface {
   first_name: string;
   last_name: string;
   cin: string;
-  cinFile: File | null;
   profile_picture: File | null;
   nationality: string;
   city: string;
@@ -32,9 +31,8 @@ export interface PersonalInformationFormInterface {
 
 export type PersonalInformationFormErrors = Omit<
   PersonalInformationFormInterface,
-  "cinFile" | "profile_picture"
+  "profile_picture"
 > & {
-  cinFile: string;
   profile_picture: string;
 };
 
@@ -98,9 +96,9 @@ export function PersonalInformationForm({
           />
           {errors.last_name && <ErrorMessage>{errors.last_name}</ErrorMessage>}
         </Labeled>
-        <Labeled label="CIN" className="lg:col-span-2">
+        <Labeled label="CIN ou Passport" className="lg:col-span-2">
           <Input
-            placeholder="Entrez votre CIN"
+            placeholder="Entrez votre CIN ou Passport"
             className="text-lg"
             value={formData.cin}
             onChange={(e) => setFormData({ ...formData, cin: e.target.value })}
@@ -108,16 +106,6 @@ export function PersonalInformationForm({
           {errors.cin && <ErrorMessage>{errors.cin}</ErrorMessage>}
         </Labeled>
 
-        <FileInput
-          type="image"
-          error={errors.cinFile}
-          file={formData.cinFile}
-          onChange={(e) => {
-            if (e.target.files && e.target.files.length > 0) {
-              setFormData({ ...formData, cinFile: e.target.files[0] });
-            }
-          }}
-        />
         <Labeled label="Nationalité" className="col-span-1">
           <SearchSelect
             options={
@@ -140,28 +128,8 @@ export function PersonalInformationForm({
             </div> */}
           {/* {errors.nationality && <ErrorMessage>{errors.nationality}</ErrorMessage>} */}
         </Labeled>
-        <Labeled label="Ville" className="col-span-1">
-          {/* <Input
-            placeholder="Entrez votre ville"
-            className="text-lg"
-            value={formData.city}
-            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-          /> */}
-          <SearchSelect
-            options={
-              CITIES.map((city) => ({
-                value: city.ville,
-              })) ?? []
-            }
-            placeholder="Entrez votre ville"
-            value={formData.city}
-            onChange={function (value: string): void {
-              setFormData({ ...formData, city: value });
-            }}
-          />
-          {errors.city && <ErrorMessage>{errors.city}</ErrorMessage>}
-        </Labeled>
-        <Labeled label="Date de naissance" className="lg:col-span-2">
+
+        <Labeled label="Date de naissance" className="lg:col-span-1">
           <Input
             type="date"
             value={formData.date_of_birth}
@@ -205,6 +173,21 @@ export function PersonalInformationForm({
             }
           />
           {errors.address && <ErrorMessage>{errors.address}</ErrorMessage>}
+        </Labeled>
+        <Labeled label="Ville" className="col-span-2">
+          <SearchSelect
+            options={
+              CITIES.map((city) => ({
+                value: city.ville,
+              })) ?? []
+            }
+            placeholder="Entrez votre ville"
+            value={formData.city}
+            onChange={function (value: string): void {
+              setFormData({ ...formData, city: value });
+            }}
+          />
+          {errors.city && <ErrorMessage>{errors.city}</ErrorMessage>}
         </Labeled>
       </div>
     </>

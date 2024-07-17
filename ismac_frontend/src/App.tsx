@@ -41,6 +41,8 @@ export interface StudentDataInterface {
 
   created_at: string;
   email: string;
+
+  is_accepted: boolean | null;
 }
 export interface UserInterface {
   id: number;

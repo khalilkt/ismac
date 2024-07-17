@@ -101,9 +101,13 @@ export function ProfilePictureInput({
         type="file"
         className="hidden"
         onChange={(e) => {
-          if (e.target.files && e.target.files.length > 0) {
+          const file = e.target.files && e.target.files[0];
+          const maxSize = 1024 * 1024 * 1;
+          if (file && file.size <= maxSize) {
             onChange && onChange(e);
+            return;
           }
+          alert("la taille de l'image doit être inférieure à 1 Mo");
         }}
       />
     </label>
@@ -115,6 +119,8 @@ export function FileInput({
   type,
   error,
   mini = false,
+  maxSize = null,
+  note = "",
 
   ...inputProps
 }: {
@@ -122,10 +128,14 @@ export function FileInput({
   error: string;
   type: "file" | "image";
   mini?: boolean;
+  maxSize?: number | null;
+  note?: string;
 } & React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
 >) {
+  const maxSizeInBytes = maxSize ? maxSize * 1024 : null;
+
   const isImage = file?.type.startsWith("image/");
   return (
     <div className="col-span-2 flex flex-col gap-y-1">
@@ -153,22 +163,31 @@ export function FileInput({
             {type === "file" ? <FileIcon /> : <ImageIcon />}
             <p className="text-gray-500 dark:text-gray-400 mt-4 text-center">
               <span className="text-secondary underline">
-                Cliquez pour télécharger
+                Cliquez pour télécharger{" "}
               </span>
               ou glisser pour déposer
             </p>
           </div>
         )}
         <input
+          {...inputProps}
           type="file"
           className="hidden"
           onChange={(e) => {
-            if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files && e.target.files[0];
+            if (file && (!maxSizeInBytes || file.size <= maxSizeInBytes)) {
               inputProps.onChange && inputProps.onChange(e);
+              return;
             }
+            alert("Ce fichier est trop grand");
           }}
         />
       </label>
+      {note && !file && (
+        <span className="text-gray-500 mt-1 text-xs text-textGray lg:text-base">
+          {note}
+        </span>
+      )}
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>
   );
