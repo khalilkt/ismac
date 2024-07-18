@@ -68,8 +68,8 @@ export function ValidationPage({
           "Type de Baccalauréat": finalForm.bac_type,
           "Année du Baccalauréat": finalForm.bac_year,
           "Note du Baccalauréat": finalForm.bac_note.toString(),
-          Département: finalForm.departement,
-          Filière: finalForm.filiere,
+          // Département: finalForm.departement,
+          // Filière: finalForm.filiere,
         }}
       />
     </>

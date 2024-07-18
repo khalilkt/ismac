@@ -282,7 +282,7 @@ export function SearchSelect({
             avoidCollisions={false}
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className="w-[var(--radix-popover-trigger-width)] max-w-[var(--radix-popover-content-available-height)]"
+            className="w-[var(--radix-popover-trigger-width)]"
           >
             <div
               className={`rounded-b border-x border-b border-gray bg-white shadow-xl ${isOpen ? "" : "hidden"}`}

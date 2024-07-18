@@ -106,8 +106,8 @@ export function SummaryPage() {
     "Type de Baccalauréat": user.student_data.bac_type,
     "Année du Baccalauréat": user.student_data.bac_year,
     "Note du Baccalauréat": user.student_data.bac_note.toString(),
-    Département: user.student_data.departement,
-    Filière: user.student_data.filiere,
+    // Département: user.student_data.departement,
+    // Filière: user.student_data.filiere,
   };
 
   const shouldUploadPortfolio =

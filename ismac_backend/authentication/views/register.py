@@ -114,6 +114,7 @@ class StudentListView(ListAPIView):
     required_query_params = {
         "type" : ["oral", "ecrit"],
     }
+    ordering = ['user__created_at']
     
     def get(self, request, *args, **kwargs):
         for key in self.required_query_params:
