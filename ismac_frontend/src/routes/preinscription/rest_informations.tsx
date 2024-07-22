@@ -139,8 +139,8 @@ export function BacInformationsForm({
             <option value="" disabled>
               Sélectionnez l'année de votre baccalauréat
             </option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
+            <option value="2022-2023">2022-2023</option>
+            <option value="2023-2024">2023-2024</option>
           </Select>
           {errors.bac_year && <ErrorMessage>{errors.bac_year}</ErrorMessage>}
         </Labeled>
@@ -168,8 +168,19 @@ export function BacInformationsForm({
           <FileInput
             type="file"
             accept=".zip"
-            note="Un fichier compressé (zip, rar) avec des pièces format PDF ou JPEG, taille maximale : 3Mo"
-            maxSize={3 * 1024}
+            note={
+              <span>
+                Un fichier compressé (zip) avec des pièces format PDF ou JPEG,
+                taille maximale : 10Mo.
+                <br />
+                <span className="font-semibold">
+                  Le dossier de candidature est composé de:
+                  <br /> - Copie de la CIN <br />- Copie du Baccalauréat <br />-
+                  Relevé des notes.
+                </span>
+              </span>
+            }
+            maxSize={10 * 1024}
             file={formData.condidatureFile}
             error={errors.condidatureFile}
             onChange={(e) =>

@@ -44,9 +44,9 @@ function PortfolioUpdatePage() {
   }
   return (
     <MDiv className="gap-y-2">
-      <Title>Félicitation!</Title>
+      <Title>Félicitations!</Title>
       <SubTitle>
-        Félicitation d’avoir réussir le premier test. Veuillez présentez votre
+        Félicitations d’avoir réussir le premier test. Veuillez présentez votre
         portfolio ci-dessous.
       </SubTitle>
       <div className="mt-8">
@@ -136,12 +136,12 @@ export function SummaryPage() {
         <>
           <img src={logo} alt="logo" className="mb-8 mt-16 w-[91px]" />
           <Title>Détails de votre Préinscription</Title>
-
+          {/* 
           <SubTitle className="mb-9 mt-3">
             {user.student_data.is_accepted !== null
               ? ""
               : "Les épreuves orales ne sont pas encore commencée"}
-          </SubTitle>
+          </SubTitle> */}
 
           <SummaryTable data={data} />
           {user.student_data.portfolio_file && (

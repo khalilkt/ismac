@@ -39,7 +39,7 @@ export function ValidationPage({
 }) {
   return (
     <>
-      <Title>Validation de Préinscriptiont </Title>
+      <Title>Validation de Préinscription </Title>
       <SubTitle className="mb-6 mt-3">
         Veuillez vérifer vos détails avant de créer votre compte.
       </SubTitle>

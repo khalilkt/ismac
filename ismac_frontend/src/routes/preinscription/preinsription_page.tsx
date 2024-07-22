@@ -306,7 +306,7 @@ export function PreInscriptionPage() {
     setBacFormData({
       codeMassar: "123456789",
       bac_type: "Sciences",
-      bac_year: "2020",
+      bac_year: "2023-2024",
       bac_note: "18.5",
       condidatureFile: null,
       is_foreign_bac: false,

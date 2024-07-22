@@ -129,7 +129,7 @@ export function FileInput({
   type: "file" | "image";
   mini?: boolean;
   maxSize?: number | null;
-  note?: string;
+  note?: ReactNode;
 } & React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
