@@ -153,10 +153,9 @@ export function BacInformationsForm({
             value={formData.bac_note}
             onChange={(e) => {
               const value = e.target.value;
-
               if (
                 value.length === 0 ||
-                (value.match(/^\d+$/) && value.length <= 2)
+                (value.match(/^\d+(\.\d{0,2})?$/) && value.length <= 5)
               ) {
                 setFormData({ ...formData, bac_note: e.target.value });
               }
