@@ -96,9 +96,9 @@ export function PersonalInformationForm({
           />
           {errors.last_name && <ErrorMessage>{errors.last_name}</ErrorMessage>}
         </Labeled>
-        <Labeled label="CIN / Passport" className="lg:col-span-2">
+        <Labeled label="CNIE / Passport" className="lg:col-span-2">
           <Input
-            placeholder="Entrez votre CIN / Passport"
+            placeholder="Entrez votre CNIE / Passport"
             className="text-lg"
             value={formData.cin}
             onChange={(e) => setFormData({ ...formData, cin: e.target.value })}
