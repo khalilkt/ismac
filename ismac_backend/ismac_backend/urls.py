@@ -30,6 +30,7 @@ urlpatterns = [
     path("register/", StudentRegisterView.as_view(), name="register"),
     path("students/<int:id>/files/", StudentFilesUpload.as_view(), name="student_files"),
     path("students/", StudentListView.as_view(), name="students"),
+    path("students/<int:pk>/", StudentDeleteView.as_view(), name="student_delete"),
     path("students/accept/", BulkAcceptStudents.as_view(), name="accept_students"),
     path("students/reset/", BulkResetStudents.as_view(), name="reject_students"),
     path("students/data/", students_data, name="students_data"),

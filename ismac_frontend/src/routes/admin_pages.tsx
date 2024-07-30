@@ -3,6 +3,7 @@ import {
   FilledButton,
   Input,
   LogoutButton,
+  OutlinedButton,
   Pagination,
   Title,
 } from "../comps/comps";
@@ -14,6 +15,23 @@ import { AuthContext } from "../App";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { LoadingIcon } from "../comps/icons";
+
+export function DeleteIcon() {
+  return (
+    <svg
+      width="14"
+      height="16"
+      viewBox="0 0 14 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M2.8335 15.5C2.37516 15.5 1.9828 15.3368 1.65641 15.0104C1.33002 14.684 1.16683 14.2917 1.16683 13.8333V3C0.930718 3 0.732802 2.92014 0.573079 2.76042C0.413357 2.60069 0.333496 2.40278 0.333496 2.16667C0.333496 1.93056 0.413357 1.73264 0.573079 1.57292C0.732802 1.41319 0.930718 1.33333 1.16683 1.33333H4.50016C4.50016 1.09722 4.58002 0.899306 4.73975 0.739583C4.89947 0.579861 5.09738 0.5 5.3335 0.5H8.66683C8.90294 0.5 9.10086 0.579861 9.26058 0.739583C9.4203 0.899306 9.50016 1.09722 9.50016 1.33333H12.8335C13.0696 1.33333 13.2675 1.41319 13.4272 1.57292C13.587 1.73264 13.6668 1.93056 13.6668 2.16667C13.6668 2.40278 13.587 2.60069 13.4272 2.76042C13.2675 2.92014 13.0696 3 12.8335 3V13.8333C12.8335 14.2917 12.6703 14.684 12.3439 15.0104C12.0175 15.3368 11.6252 15.5 11.1668 15.5H2.8335ZM11.1668 3H2.8335V13.8333H11.1668V3ZM5.3335 12.1667C5.56961 12.1667 5.76752 12.0868 5.92725 11.9271C6.08697 11.7674 6.16683 11.5694 6.16683 11.3333V5.5C6.16683 5.26389 6.08697 5.06597 5.92725 4.90625C5.76752 4.74653 5.56961 4.66667 5.3335 4.66667C5.09738 4.66667 4.89947 4.74653 4.73975 4.90625C4.58002 5.06597 4.50016 5.26389 4.50016 5.5V11.3333C4.50016 11.5694 4.58002 11.7674 4.73975 11.9271C4.89947 12.0868 5.09738 12.1667 5.3335 12.1667ZM8.66683 12.1667C8.90294 12.1667 9.10086 12.0868 9.26058 11.9271C9.4203 11.7674 9.50016 11.5694 9.50016 11.3333V5.5C9.50016 5.26389 9.4203 5.06597 9.26058 4.90625C9.10086 4.74653 8.90294 4.66667 8.66683 4.66667C8.43072 4.66667 8.2328 4.74653 8.07308 4.90625C7.91336 5.06597 7.8335 5.26389 7.8335 5.5V11.3333C7.8335 11.5694 7.91336 11.7674 8.07308 11.9271C8.2328 12.0868 8.43072 12.1667 8.66683 12.1667Z"
+        fill="#888888"
+      />
+    </svg>
+  );
+}
 
 export interface PaginatedData<T> {
   count: number;
@@ -202,6 +220,7 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
     null,
   );
   const token = useContext(AuthContext).authData?.token;
+  const [deletingId, setDeletingId] = React.useState<number | null>(null);
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -237,6 +256,46 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
   }
   return (
     <div className="flex flex-col px-9">
+      <MDialog
+        isOpen={deletingId !== null}
+        title="Confirmer la suppression"
+        onClose={() => setDeletingId(null)}
+      >
+        <div className="flex flex-col items-center">
+          <p>
+            Vous êtes sur le point de supprimer un étudiant de la base de
+            données.
+            <br /> Veuillez confirmer cette action.
+          </p>
+          <div className="mt-10 flex w-full flex-row gap-x-4">
+            <OutlinedButton
+              onClick={() => {
+                setDeletingId(null);
+              }}
+              className="flex-1"
+            >
+              Annuler
+            </OutlinedButton>
+            <FilledButton
+              onClick={() => {
+                setDeletingId(null);
+                axios
+                  .delete(rootUrl + "students/" + deletingId + "/", {
+                    headers: {
+                      Authorization: `Token ${token}`,
+                    },
+                  })
+                  .then((response) => {
+                    load();
+                  });
+              }}
+              className="flex-1 bg-error text-white"
+            >
+              Confirmer
+            </FilledButton>
+          </div>
+        </div>
+      </MDialog>
       <MDialog
         isOpen={dialogOpen}
         title="Ajouter un étudiant"
@@ -326,6 +385,11 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
                 <th className="border border-gray px-4 py-2 font-normal">
                   {type === "ecrit" ? "Dossier" : "Portfolio"}
                 </th>
+                {type === "ecrit" && (
+                  <th className="border border-gray px-4 py-2 font-normal">
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -398,6 +462,18 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
                           </span>
                         ))}
                     </td>
+                    {type === "ecrit" && (
+                      <td className="border border-gray px-4 py-2">
+                        <button
+                          onClick={() => {
+                            setDeletingId(student.id);
+                          }}
+                          className="flex items-center justify-center transition-all duration-100 active:scale-90"
+                        >
+                          <DeleteIcon />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
             </tbody>

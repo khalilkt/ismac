@@ -1,6 +1,6 @@
 import random
 import string
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, ListAPIView, DestroyAPIView
 from authentication.models import UserSerializer , User, StudentDataSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework import serializers
@@ -140,6 +140,16 @@ class StudentListView(ListAPIView):
         #     student.save()
         return StudentData.objects.filter(user__is_admin=False)
     
+class StudentDeleteView(DestroyAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = StudentData.objects.all()
+    def delete(self, request, *args, **kwargs):
+        studentData = self.get_object()
+        user = studentData.user
+        user.delete()
+        return Response({"message" : "Student deleted"})
+    
+
 class BulkAcceptStudents(APIView):
     permission_classes = [IsAdminUser]
     def post(self, request):
