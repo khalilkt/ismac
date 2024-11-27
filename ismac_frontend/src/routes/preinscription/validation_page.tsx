@@ -37,6 +37,7 @@ export function ValidationPage({
 }: {
   finalForm: RegisterDataInterface;
 }) {
+  const isMaster = finalForm.is_master;
   return (
     <>
       <Title>Validation de Préinscription </Title>
@@ -55,22 +56,53 @@ export function ValidationPage({
         </div>
       )}
       <SummaryTable
-        data={{
-          "Nom Complet": finalForm.first_name + " " + finalForm.last_name,
-          CIN: finalForm.cin,
-          Nationalité: finalForm.nationality,
-          "Date de naissance": finalForm.date_of_birth,
-          Email: finalForm.email,
-          "N° de téléphone": finalForm.phone,
-          Adresse: finalForm.address,
-          Ville: finalForm.city,
-          "Code Massar": finalForm.codeMassar,
-          "Type de Baccalauréat": finalForm.bac_type,
-          "Année du Baccalauréat": finalForm.bac_year,
-          "Note du Baccalauréat": finalForm.bac_note.toString(),
-          // Département: finalForm.departement,
-          // Filière: finalForm.filiere,
-        }}
+        data={
+          {
+            "Nom Complet": finalForm.first_name + " " + finalForm.last_name,
+            CIN: finalForm.cin,
+            Nationalité: finalForm.nationality,
+            Ville: finalForm.city,
+            "Date de naissance": finalForm.date_of_birth,
+            Email: finalForm.email,
+            "N° de téléphone": finalForm.phone,
+            Adresse: finalForm.address,
+            "Code Massar": finalForm.codeMassar,
+            "Type de Baccalauréat": finalForm.bac_type,
+
+            ...(!isMaster && {
+              "Note du Baccalauréat": finalForm.diplome_note.toString(),
+            }),
+            ...(isMaster && {
+              "Note de Licence": finalForm.diplome_note.toString(),
+            }),
+            ...(isMaster && { "Nom de la Licence": finalForm.licence_name! }),
+
+            ...(isMaster && { "Année de Licence": finalForm.diplome_year }),
+            ...(!isMaster && {
+              "Année du Baccalauréat": finalForm.diplome_year,
+            }),
+
+            // Département: user.student_data.departement,
+            // Filière: user.student_data.filiere,
+          }
+
+          //   {
+          //   "Nom Complet": finalForm.first_name + " " + finalForm.last_name,
+          //   CIN: finalForm.cin,
+          //   Nationalité: finalForm.nationality,
+          //   "Date de naissance": finalForm.date_of_birth,
+          //   Email: finalForm.email,
+          //   "N° de téléphone": finalForm.phone,
+          //   Adresse: finalForm.address,
+          //   Ville: finalForm.city,
+          //   "Code Massar": finalForm.codeMassar,
+          //   "Type de Baccalauréat": finalForm.bac_type,
+          //   "Année du Baccalauréat": finalForm.diplome_year,
+          //   "Note du Baccalauréat": finalForm.diplome_note.toString(),
+          //   // Département: finalForm.departement,
+          //   // Filière: finalForm.filiere,
+          // }
+        }
       />
     </>
   );

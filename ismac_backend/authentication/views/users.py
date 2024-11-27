@@ -51,7 +51,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     search_fields = ["name", "email"]
     
     def get_queryset(self):
-        ret = User.objects.all()
+        ret = User.objects.all()     
         return ret
     
     def partial_update(self, request, *args, **kwargs):

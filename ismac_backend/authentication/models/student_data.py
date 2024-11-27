@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 class StudentData(models.Model):
     user = models.OneToOneField('User', on_delete=models.CASCADE, related_name='student_data')
+    
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     cin = models.CharField(max_length=255)
@@ -16,12 +17,16 @@ class StudentData(models.Model):
     address = models.CharField(max_length=255)
     profile_picture = models.FileField(null=True, blank=True)
 
+    is_master = models.BooleanField()
+
     is_foreign_bac = models.BooleanField()
     codeMassar = models.CharField(max_length=255)
     bac_type = models.CharField(max_length=255)
-    bac_year = models.CharField(max_length=255)
-    bac_note = models.CharField(max_length=255)
+    diplome_year = models.CharField(max_length=255)
+    diplome_note = models.CharField(max_length=255)
+    licence_name = models.CharField(max_length=255, null = True, blank = True)
     condidatureFile = models.FileField(null=True, blank=True)
+
 
     departement = models.CharField(max_length=255)
     filiere = models.CharField(max_length=255)

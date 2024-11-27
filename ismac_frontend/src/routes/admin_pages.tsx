@@ -123,7 +123,7 @@ function SearchInput({
   }
 
   return (
-    <label className="relative h-max w-[300px]">
+    <label className="relative h-max">
       <input
         onChange={onSearchChange}
         placeholder="Rechercher"
@@ -203,7 +203,7 @@ function BulkAddStudentsDialog({ onDone }: { onDone: () => void }) {
           value.split("\n").filter((v) => v.trim().length > 0).length === 0
         }
         onClick={post}
-        className="w-full self-end rounded-lg bg-secondary px-4 py-2 text-center text-white transition-all active:scale-90 disabled:opacity-40 disabled:active:scale-100"
+        className="w-full self-end rounded-lg bg-primary px-4 py-2 text-center text-white transition-all active:scale-90 disabled:opacity-40 disabled:active:scale-100"
       >
         {isSubmitting ? (
           <LoadingIcon className="mx-auto stroke-white" />
@@ -312,28 +312,53 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
         {type === "oral" ? "Test Oral" : "Test ecrit"}
       </h1>
       <div className="flex w-full justify-between">
-        <SearchInput
-          initialValue={searchParams.get("search") ?? ""}
-          onChange={function (value: string): void {
-            if (value === "") {
+        <div className="flex gap-x-4">
+          <SearchInput
+            initialValue={searchParams.get("search") ?? ""}
+            onChange={function (value: string): void {
+              if (value === "") {
+                setSearchParams((params) => {
+                  params.delete("search");
+                  return params;
+                });
+                return;
+              }
               setSearchParams((params) => {
-                params.delete("search");
+                params.set("search", value);
                 return params;
               });
-              return;
-            }
-            setSearchParams((params) => {
-              params.set("search", value);
-              return params;
-            });
-          }}
-        />
+            }}
+          />
+          {type === "ecrit" && (
+            <select
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v == "") {
+                  setSearchParams((params) => {
+                    params.delete("program");
+                    return params;
+                  });
+                  return;
+                }
+                setSearchParams((params) => {
+                  params.set("program", e.target.value);
+                  return params;
+                });
+              }}
+              className="rounded-lg border border-gray px-4 py-2"
+            >
+              <option value="">Tous</option>
+              <option value="master">Master</option>
+              <option value="licence">Licence</option>
+            </select>
+          )}
+        </div>
         {type === "oral" ? (
           <button
             onClick={() => {
               setDialogOpen(true);
             }}
-            className="ml-4 rounded-lg bg-secondary px-4 py-2 text-white transition-all active:scale-90"
+            className="ml-4 rounded-lg bg-primary px-4 py-2 text-white transition-all active:scale-90"
           >
             Ajouter
           </button>
@@ -341,11 +366,15 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
           <button
             onClick={() => {
               // rootUrl + "students/data/"
-              const url = rootUrl + "students/data/";
+
+              let url = rootUrl + "students/data/";
+              if (searchParams.get("program")) {
+                url += `?program=${searchParams.get("program")}`;
+              }
               // just open the url in a new tab
               window.open(url, "_blank");
             }}
-            className="ml-4 rounded-lg bg-secondary px-4 py-2 text-white transition-all active:scale-90"
+            className="ml-4 rounded-lg bg-primary px-4 py-2 text-white transition-all active:scale-90"
           >
             Imprimer
           </button>
@@ -381,6 +410,9 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
                 </th>
                 <th className="border border-gray px-4 py-2 font-normal">
                   Moyenne Gen
+                </th>
+                <th className="border border-gray px-4 py-2 font-normal">
+                  Licence
                 </th>
                 <th className="border border-gray px-4 py-2 font-normal">
                   {type === "ecrit" ? "Dossier" : "Portfolio"}
@@ -428,7 +460,10 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
                       {student.codeMassar}
                     </td>
                     <td className="border border-gray px-4 py-2">
-                      {student.bac_note}
+                      {student.diplome_note}
+                    </td>
+                    <td className="border border-gray px-4 py-2">
+                      {student.licence_name ?? "-"}
                     </td>
                     <td className="border border-gray px-4 py-2">
                       {type === "ecrit" &&

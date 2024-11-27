@@ -71,10 +71,12 @@ export function PreInscriptionPage() {
   });
 
   const [bacFormData, setBacFormData] = useState<BacInformationFormInterface>({
+    is_master: null,
+    licence_name: null,
     codeMassar: "",
     bac_type: "",
-    bac_year: "",
-    bac_note: "",
+    diplome_year: "",
+    diplome_note: "",
     condidatureFile: null,
     is_foreign_bac: false,
   });
@@ -82,10 +84,12 @@ export function PreInscriptionPage() {
   const [bacErrors, setBacErrors] = useState({
     codeMassar: "",
     bac_type: "",
-    bac_year: "",
-    bac_note: "",
+    diplome_year: "",
+    diplome_note: "",
     condidatureFile: "",
     is_foreign_bac: "",
+    is_master: "",
+    licence_name: "",
   });
 
   const [finalForm, setFinalForm] = useState({
@@ -113,10 +117,12 @@ export function PreInscriptionPage() {
     setBacErrors({
       codeMassar: "",
       bac_type: "",
-      bac_year: "",
-      bac_note: "",
+      diplome_year: "",
+      diplome_note: "",
       condidatureFile: "",
       is_foreign_bac: "",
+      is_master: "",
+      licence_name: "",
     });
     setFinalErros({
       departement: "",
@@ -195,7 +201,19 @@ export function PreInscriptionPage() {
       }
     } else if (step === "bac_informations") {
       for (const fieldName in bacFormData) {
-        if (
+        if (fieldName === "licence_name") {
+          if (
+            (bacFormData.is_master === true &&
+              bacFormData.licence_name === null) ||
+            bacFormData.licence_name === ""
+          ) {
+            setBacErrors((prev) => ({
+              ...prev,
+              [fieldName]: "Ce champ est requis",
+            }));
+            isGood = false;
+          }
+        } else if (
           bacFormData[fieldName as keyof BacInformationFormInterface] === ""
         ) {
           setBacErrors((prev) => ({
@@ -203,10 +221,19 @@ export function PreInscriptionPage() {
             [fieldName]: "Ce champ est requis",
           }));
           isGood = false;
-        } else if (fieldName.toLowerCase() == "bac_note") {
+        } else if (
+          fieldName.toLowerCase() === "is_master" &&
+          bacFormData.is_master === null
+        ) {
+          setBacErrors((prev) => ({
+            ...prev,
+            [fieldName]: "Ce champ est requis",
+          }));
+          isGood = false;
+        } else if (fieldName.toLowerCase() == "diplome_note") {
           if (
-            parseFloat(bacFormData.bac_note) > 20 ||
-            parseFloat(bacFormData.bac_note) < 0
+            parseFloat(bacFormData.diplome_note) > 20 ||
+            parseFloat(bacFormData.diplome_note) < 0
           ) {
             setBacErrors((prev) => ({
               ...prev,
@@ -214,7 +241,7 @@ export function PreInscriptionPage() {
             }));
             isGood = false;
           }
-          if (parseFloat(bacFormData.bac_note) < 12) {
+          if (parseFloat(bacFormData.diplome_note) < 12) {
             setBacErrors((prev) => ({
               ...prev,
               [fieldName]: "Note inférieure à 12",
@@ -289,33 +316,34 @@ export function PreInscriptionPage() {
     setIsSubmitting(false);
   }
 
-  function fillDummyData() {
-    const randomNumber = Math.floor(Math.random() * 1000);
-    setFormData({
-      first_name: "Moohamed khalil",
-      last_name: "Ktiri",
-      cin: "AA0221",
-      nationality: "Maroc",
-      city: "Rabat",
-      date_of_birth: "1990-01-01",
-      email: "example" + randomNumber.toString() + "@example.com",
-      phone: "+1234567890",
-      address: "123 Main St",
-      profile_picture: null,
-    });
-    setBacFormData({
-      codeMassar: "123456789",
-      bac_type: "Sciences",
-      bac_year: "2023-2024",
-      bac_note: "18.5",
-      condidatureFile: null,
-      is_foreign_bac: false,
-    });
-    setFinalForm({
-      departement: "Computer Science",
-      filiere: "Software Engineering",
-    });
-  }
+  // function fillDummyData() {
+  //   const randomNumber = Math.floor(Math.random() * 1000);
+  //   setFormData({
+  //     first_name: "Moohamed khalil",
+  //     last_name: "Ktiri",
+  //     cin: "AA0221",
+  //     nationality: "Maroc",
+  //     city: "Rabat",
+  //     date_of_birth: "1990-01-01",
+  //     email: "example" + randomNumber.toString() + "@example.com",
+  //     phone: "+1234567890",
+  //     address: "123 Main St",
+  //     profile_picture: null,
+  //   });
+  //   setBacFormData({
+  //     codeMassar: "123456789",
+  //     bac_type: "Sciences",
+  //     diplome_year: "2023-2024",
+  //     diplome_note: "18.5",
+  //     condidatureFile: null,
+  //     is_foreign_bac: false,
+  //     is_master: bull,
+  //   });
+  //   setFinalForm({
+  //     departement: "Computer Science",
+  //     filiere: "Software Engineering",
+  //   });
+  // }
 
   return (
     <div
@@ -416,6 +444,7 @@ export function PreInscriptionPage() {
               {step === "personal_informations" ? "Annuler" : "Précédent"}
             </OutlinedButton>
             <FilledButton
+              bg="primary"
               disabled={step === "validation" && !didAcceptTerms}
               className="w-full disabled:opacity-30"
               onClick={() => {

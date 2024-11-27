@@ -92,7 +92,9 @@ function PortfolioUpdatePage() {
 export function SummaryPage() {
   const user = useContext(AuthContext).authData!.user!;
 
-  const data = {
+  const isMaster = user.student_data.is_master;
+
+  const data: { [key: string]: string } = {
     "Nom Complet":
       user.student_data.first_name + " " + user.student_data.last_name,
     CIN: user.student_data.cin,
@@ -104,8 +106,21 @@ export function SummaryPage() {
     Adresse: user.student_data.address,
     "Code Massar": user.student_data.codeMassar,
     "Type de Baccalauréat": user.student_data.bac_type,
-    "Année du Baccalauréat": user.student_data.bac_year,
-    "Note du Baccalauréat": user.student_data.bac_note.toString(),
+
+    ...(!isMaster && {
+      "Note du Baccalauréat": user.student_data.diplome_note.toString(),
+    }),
+    ...(isMaster && {
+      "Note de Licence": user.student_data.diplome_note.toString(),
+    }),
+
+    ...(isMaster && { "Nom de la Licence": user.student_data.licence_name! }),
+
+    ...(isMaster && { "Année de Licence": user.student_data.diplome_year }),
+    ...(!isMaster && {
+      "Année du Baccalauréat": user.student_data.diplome_year,
+    }),
+
     // Département: user.student_data.departement,
     // Filière: user.student_data.filiere,
   };

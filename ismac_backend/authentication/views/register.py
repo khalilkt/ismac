@@ -133,12 +133,14 @@ class StudentListView(ListAPIView):
         ret =  super().filter_queryset(queryset)
         return ret
     def get_queryset(self):
-        # students = StudentData.objects.filter(user__is_admin=False)
-        # for student in students:
-        #     code_massar = random.choice(string.ascii_uppercase) + ''.join(random.choices(string.digits, k=9))
-        #     student.codeMassar = code_massar
-        #     student.save()
-        return StudentData.objects.filter(user__is_admin=False)
+        ret = StudentData.objects.filter(user__is_admin=False)
+        if "program" in self.request.query_params:
+            program = self.request.query_params.get('program')
+            if program == "master":
+                ret = ret.filter(is_master=True)
+            elif program == "licence":
+                ret = ret.filter(is_master=False)
+        return ret
     
 class StudentDeleteView(DestroyAPIView):
     permission_classes = [IsAdminUser]
@@ -179,8 +181,18 @@ def format_datetime(date):
     return date.strftime("%Y-%m-%d %H:%M:%S")
 
 def students_data(request):
+    program = request.GET.get('program')
+    file_name = "Liste des étudiants"
+
+    if program :
+        if program == "master":
+            file_name = "Liste des étudiants master"
+        elif program == "licence":
+            file_name = "Liste des étudiants licence"
+    file_name += ".xls"
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="Liste des etudiants.xls"'
+    response['Content-Disposition'] = 'attachment; filename="' + file_name + '"'
+
 
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet('Liste des étudiants')
@@ -192,6 +204,11 @@ def students_data(request):
         ws.write(row_num, col_num, columns[col_num], font_style)
     font_style = xlwt.XFStyle()
     students = StudentData.objects.filter(user__is_admin=False)
+    if program and program == "master":
+        students = students.filter(is_master=True)
+    elif program and program == "licence":
+        students = students.filter(is_master=False)
+        
     for student in students:
         row_num += 1
         ws.write(row_num, 0, student.first_name, font_style)
@@ -204,8 +221,8 @@ def students_data(request):
         ws.write(row_num, 7, student.address, font_style)
         ws.write(row_num, 8, student.codeMassar, font_style)
         ws.write(row_num, 9, student.bac_type, font_style)
-        ws.write(row_num, 10, student.bac_year, font_style)
-        ws.write(row_num, 11, student.bac_note, font_style)
+        ws.write(row_num, 10, student.diplome_year, font_style)
+        ws.write(row_num, 11, student.diplome_note, font_style)
         ws.write(row_num, 12, student.departement, font_style)
         ws.write(row_num, 13, student.filiere, font_style)
         ws.write(row_num, 14, student.user.email, font_style)

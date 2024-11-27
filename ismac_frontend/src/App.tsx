@@ -30,11 +30,13 @@ export interface StudentDataInterface {
   phone: string;
   address: string;
   codeMassar: string;
+  is_master: boolean;
   bac_type: string;
-  bac_year: string;
-  bac_note: string | number;
+  diplome_year: string;
+  diplome_note: string | number;
   condidatureFile: string;
   departement: string;
+  licence_name: string | null;
   filiere: string;
 
   portfolio_file: string | null;

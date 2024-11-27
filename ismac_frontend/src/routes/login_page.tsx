@@ -1,5 +1,11 @@
 import logo from "../assets/images/logo text.png";
-import { FilledButton, Input, SubTitle, Title } from "../comps/comps";
+import {
+  FilledButton,
+  Input,
+  OutlinedButton,
+  SubTitle,
+  Title,
+} from "../comps/comps";
 
 import image from "../assets/images/login.jpg";
 import { Labeled } from "../comps/form_comps";
@@ -61,6 +67,7 @@ export function LoginPage() {
           </button> */}
         </div>
         <FilledButton
+          bg="primary"
           className="mt-10"
           onClick={() => {
             logIn();
@@ -69,17 +76,17 @@ export function LoginPage() {
           Se connecter
         </FilledButton>
         <span className="text-center">ou</span>
-        <FilledButton
+        <OutlinedButton
+          className="py-4"
           onClick={() => {
             window.location.href = "/preinscription";
           }}
-          bg="primary"
         >
           Créer un compte
-        </FilledButton>
+        </OutlinedButton>
         <div className="flex-1" />
       </div>
-      <img src={image} className="hidden lg:block lg:w-[50vw]" />
+      <img src={image} className="hidden object-cover lg:block lg:w-[50vw]" />
     </div>
   );
 }

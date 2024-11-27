@@ -3,11 +3,13 @@ import { Input, Select, SubTitle, Title } from "../../comps/comps";
 import { ErrorMessage, FileInput, Labeled } from "../../comps/form_comps";
 
 export interface BacInformationFormInterface {
+  is_master: boolean | null;
+  licence_name: string | null;
   is_foreign_bac: boolean;
   codeMassar: string;
   bac_type: string;
-  bac_year: string;
-  bac_note: string;
+  diplome_year: string;
+  diplome_note: string;
   condidatureFile: File | null;
 }
 
@@ -30,10 +32,11 @@ const BAC_TYPES = [
 
 export type BacInformationFormErrors = Omit<
   BacInformationFormInterface,
-  "condidatureFile" | "is_foreign_bac"
+  "condidatureFile" | "is_foreign_bac" | "is_master"
 > & {
   condidatureFile: string;
   is_foreign_bac: string;
+  is_master: string;
 };
 
 export function BacInformationsForm({
@@ -47,6 +50,7 @@ export function BacInformationsForm({
   //   onErrorChange: (errors: BacInformationFormErrors) => void;
 }) {
   const [isCustomBacType, setIsCustomBacType] = useState(false);
+  const currentYear = new Date().getFullYear();
 
   return (
     <>
@@ -55,141 +59,222 @@ export function BacInformationsForm({
         Veuillez entrer vos détails pour créer votre compte de candidature.
       </SubTitle>
       <div className="mt-8 grid grid-cols-1 gap-x-4 gap-y-6">
-        <Labeled label="Bac étranger" className="col-span-1">
+        <Labeled label="Choisissez votre programme" className="col-span-1">
           <Select
-            className="text-lg"
-            value={formData.is_foreign_bac ? "oui" : "non"}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                is_foreign_bac: e.target.value === "oui",
-              })
+            value={
+              formData.is_master === null
+                ? ""
+                : formData.is_master
+                  ? "master"
+                  : "licence"
             }
-          >
-            <option value="oui">Oui</option>
-            <option value="non">Non</option>
-          </Select>
-        </Labeled>
-        <Labeled
-          label={
-            formData.is_foreign_bac
-              ? "Référence du baccalauréat"
-              : "Code Massar"
-          }
-          className="col-span-1"
-        >
-          <Input
-            placeholder={
-              formData.is_foreign_bac
-                ? "Entrez la référence de votre baccalauréat"
-                : "Entrez votre code Massar"
-            }
-            className="text-lg"
-            value={formData.codeMassar}
-            onChange={(e) =>
-              setFormData({ ...formData, codeMassar: e.target.value })
-            }
-          />
-          {errors.codeMassar && (
-            <ErrorMessage>{errors.codeMassar}</ErrorMessage>
-          )}
-        </Labeled>
-        <Labeled label="Type de baccalauréat" className="col-span-1">
-          {isCustomBacType ? (
-            <Input
-              placeholder="Entrez le type de votre baccalauréat"
-              className="text-lg"
-              value={formData.bac_type}
-              onChange={(e) =>
-                setFormData({ ...formData, bac_type: e.target.value })
-              }
-            />
-          ) : (
-            <Select
-              value={formData.bac_type}
-              onChange={(e) => {
-                if (e.target.value === "OTHER") {
-                  setIsCustomBacType(true);
-                  setFormData({ ...formData, bac_type: "" });
-                  return;
-                }
-                setFormData({ ...formData, bac_type: e.target.value });
-              }}
-            >
-              <option value="" disabled>
-                Sélectionnez un type de baccalauréat
-              </option>
-              {BAC_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-              <option value="OTHER">Autre</option>
-            </Select>
-          )}
-          {errors.bac_type && <ErrorMessage>{errors.bac_type}</ErrorMessage>}
-        </Labeled>
-        <Labeled label="Année du baccalauréat" className="col-span-1">
-          <Select
-            value={formData.bac_year}
-            onChange={(e) =>
-              setFormData({ ...formData, bac_year: e.target.value })
-            }
-          >
-            <option value="" disabled>
-              Sélectionnez l'année de votre baccalauréat
-            </option>
-            <option value="2022-2023">2022-2023</option>
-            <option value="2023-2024">2023-2024</option>
-          </Select>
-          {errors.bac_year && <ErrorMessage>{errors.bac_year}</ErrorMessage>}
-        </Labeled>
-        <Labeled label="Moyenne générale" className="col-span-1">
-          <Input
-            placeholder="Entrez votre moyenne générale"
-            className="text-lg"
-            max={20}
-            min={0}
-            value={formData.bac_note}
             onChange={(e) => {
               const value = e.target.value;
-              if (
-                value.length === 0 ||
-                (value.match(/^\d+(\.\d{0,2})?$/) && value.length <= 5)
-              ) {
-                setFormData({ ...formData, bac_note: e.target.value });
-              }
-            }}
-          />
-          {errors.bac_note && <ErrorMessage>{errors.bac_note}</ErrorMessage>}
-        </Labeled>
-        <Labeled label="Fichier de condidature" className="col-span-1">
-          <FileInput
-            type="file"
-            accept=".zip"
-            note={
-              <span>
-                Un fichier compressé (zip) avec des pièces format PDF ou JPEG,
-                taille maximale : 10Mo.
-                <br />
-                <span className="font-semibold">
-                  Le dossier de candidature est composé de:
-                  <br /> - Copie de la CIN <br />- Copie du Baccalauréat <br />-
-                  Relevé des notes.
-                </span>
-              </span>
-            }
-            maxSize={10 * 1024}
-            file={formData.condidatureFile}
-            error={errors.condidatureFile}
-            onChange={(e) =>
+              if (value !== "master" && value !== "licence") return;
               setFormData({
                 ...formData,
-                condidatureFile: e.target.files?.[0] ?? null,
-              })
-            }
-          />
+                is_master: value === "master",
+                licence_name: null,
+              });
+            }}
+          >
+            <option value="" disabled>
+              Choisissez votre programme
+            </option>
+            <option value="licence">Licence</option>
+            <option value="master">Master</option>
+          </Select>
+          {errors.is_master && <ErrorMessage>{errors.is_master}</ErrorMessage>}
         </Labeled>
+        {formData.is_master !== null && (
+          <>
+            <Labeled label="Bac étranger" className="col-span-1">
+              <Select
+                className="text-lg"
+                value={formData.is_foreign_bac ? "oui" : "non"}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    is_foreign_bac: e.target.value === "oui",
+                  })
+                }
+              >
+                <option value="oui">Oui</option>
+                <option value="non">Non</option>
+              </Select>
+            </Labeled>
+            <Labeled
+              label={
+                formData.is_foreign_bac
+                  ? "Référence du baccalauréat"
+                  : "Code Massar"
+              }
+              className="col-span-1"
+            >
+              <Input
+                placeholder={
+                  formData.is_foreign_bac
+                    ? "Entrez la référence de votre baccalauréat"
+                    : "Entrez votre code Massar"
+                }
+                className="text-lg"
+                value={formData.codeMassar}
+                onChange={(e) =>
+                  setFormData({ ...formData, codeMassar: e.target.value })
+                }
+              />
+              {errors.codeMassar && (
+                <ErrorMessage>{errors.codeMassar}</ErrorMessage>
+              )}
+            </Labeled>
+            <Labeled label="Type de baccalauréat" className="col-span-1">
+              {isCustomBacType ? (
+                <Input
+                  placeholder="Entrez le type de votre baccalauréat"
+                  className="text-lg"
+                  value={formData.bac_type}
+                  onChange={(e) =>
+                    setFormData({ ...formData, bac_type: e.target.value })
+                  }
+                />
+              ) : (
+                <Select
+                  value={formData.bac_type}
+                  onChange={(e) => {
+                    if (e.target.value === "OTHER") {
+                      setIsCustomBacType(true);
+                      setFormData({ ...formData, bac_type: "" });
+                      return;
+                    }
+                    setFormData({ ...formData, bac_type: e.target.value });
+                  }}
+                >
+                  <option value="" disabled>
+                    Sélectionnez un type de baccalauréat
+                  </option>
+                  {BAC_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                  <option value="OTHER">Autre</option>
+                </Select>
+              )}
+              {errors.bac_type && (
+                <ErrorMessage>{errors.bac_type}</ErrorMessage>
+              )}
+            </Labeled>
+            {formData.is_master && (
+              <Labeled label={"Licence"} className="col-span-1">
+                <Input
+                  placeholder={"Entrez le nom de votre licence"}
+                  className="text-lg"
+                  value={formData.licence_name ?? ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, licence_name: e.target.value })
+                  }
+                />
+                {errors.licence_name && (
+                  <ErrorMessage>{errors.licence_name}</ErrorMessage>
+                )}
+              </Labeled>
+            )}
+            <Labeled
+              label={
+                formData.is_master
+                  ? "Année de licence"
+                  : "Année du baccalauréat"
+              }
+              className="col-span-1"
+            >
+              <Select
+                value={formData.diplome_year}
+                onChange={(e) =>
+                  setFormData({ ...formData, diplome_year: e.target.value })
+                }
+              >
+                <option value="" disabled>
+                  Sélectionnez l'année de votre{" "}
+                  {formData.is_master ? "licence" : "baccalauréat"}
+                </option>
+                {[
+                  `${currentYear - 2}-${currentYear - 1}`,
+                  `${currentYear - 1}-${currentYear}`,
+                ].map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Select>
+              {errors.diplome_year && (
+                <ErrorMessage>{errors.diplome_year}</ErrorMessage>
+              )}
+            </Labeled>
+            <Labeled
+              label={
+                "Moyenne générale " + (formData.is_master ? "(licence)" : "")
+              }
+              className="col-span-1"
+            >
+              <Input
+                placeholder="Entrez votre moyenne générale"
+                className="text-lg"
+                max={20}
+                min={0}
+                value={formData.diplome_note}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (
+                    value.length === 0 ||
+                    (value.match(/^\d+(\.\d{0,2})?$/) && value.length <= 5)
+                  ) {
+                    setFormData({ ...formData, diplome_note: e.target.value });
+                  }
+                }}
+              />
+              {errors.diplome_note && (
+                <ErrorMessage>{errors.diplome_note}</ErrorMessage>
+              )}
+            </Labeled>
+
+            <Labeled label="Fichier de condidature" className="col-span-1">
+              <FileInput
+                type="file"
+                accept=".zip"
+                note={
+                  <span>
+                    Un fichier compressé (zip) avec des pièces format PDF ou
+                    JPEG, taille maximale : 10Mo.
+                    <br />
+                    <span className="font-semibold">
+                      Le dossier de candidature est composé de:
+                      {formData.is_master ? (
+                        <>
+                          <br /> - Copie de la CIN <br />- Copie du Baccalauréat{" "}
+                          <br />- Copie de Licence
+                        </>
+                      ) : (
+                        <>
+                          <br /> - Copie de la CIN <br />- Copie du Baccalauréat{" "}
+                          <br />- Relevé des notes.
+                        </>
+                      )}
+                    </span>
+                  </span>
+                }
+                maxSize={10 * 1024}
+                file={formData.condidatureFile}
+                error={errors.condidatureFile}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    condidatureFile: e.target.files?.[0] ?? null,
+                  })
+                }
+              />
+            </Labeled>
+          </>
+        )}
       </div>
     </>
   );
