@@ -31,9 +31,14 @@ class SendMailView(APIView):
 
 def send_user_register_email(user : User, student_data : StudentData,  password):
     subject = "Inscription au concours ISMAC"
+    if (student_data.is_master):
+        ee = "Master"
+    else:
+        ee = "Licence"
     context = {
         "first_name" : student_data.first_name,
         "last_name" : student_data.last_name,
+        "ee" : ee,
         "password" : password,
         "email" : user.email,
         "created_at" : user.created_at,
