@@ -187,7 +187,13 @@ export function BacInformationsForm({
               }
               className="col-span-1"
             >
-              <Select
+              <Input
+              value={formData.diplome_year}
+              onChange={(e) =>
+                setFormData({ ...formData, diplome_year: e.target.value })
+              }
+              />
+              {/* <Select
                 value={formData.diplome_year}
                 onChange={(e) =>
                   setFormData({ ...formData, diplome_year: e.target.value })
@@ -205,7 +211,7 @@ export function BacInformationsForm({
                     {year}
                   </option>
                 ))}
-              </Select>
+              </Select> */}
               {errors.diplome_year && (
                 <ErrorMessage>{errors.diplome_year}</ErrorMessage>
               )}

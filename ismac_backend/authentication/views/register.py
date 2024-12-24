@@ -19,11 +19,15 @@ from django.utils import timezone
 
 
 
-class SendMailView(APIView):
+class TestSendMailView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-        user = User.objects.first()
+        user = User.objects.get(id=6)
+        
         student_data = StudentData.objects.get(user=user)
+        student_data.is_master = True
+        student_data.licence_name = "Licence en informatique"
+        student_data.save()
         if not student_data:
             return Response({"message" : "No student data found"})
         send_user_register_email(user = user, student_data = student_data, password="1234")
@@ -32,13 +36,14 @@ class SendMailView(APIView):
 def send_user_register_email(user : User, student_data : StudentData,  password):
     subject = "Inscription au concours ISMAC"
     if (student_data.is_master):
-        ee = "Master"
+        subscribed_for = "Master"
     else:
-        ee = "Licence"
+        subscribed_for = "Licence"
+    print("subscribed_for", subscribed_for)
     context = {
         "first_name" : student_data.first_name,
         "last_name" : student_data.last_name,
-        "ee" : ee,
+        "subscribed_for" : subscribed_for,
         "password" : password,
         "email" : user.email,
         "created_at" : user.created_at,
@@ -73,8 +78,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         student_data.pop('is_accepted', None)
         password = self.generate_password(student_data.get('first_name'), student_data.get('last_name'))
         print(password)
-        # aksmd_mkamsdk_8540
-        # adamsdma@gmail.com
         with transaction.atomic():
             user = User.objects.create_user(**validated_data, password=password)
             student_data = StudentData.objects.create(user=user, **student_data)
@@ -188,12 +191,13 @@ def format_datetime(date):
 def students_data(request):
     program = request.GET.get('program')
     file_name = "Liste des étudiants"
-
-    if program :
-        if program == "master":
-            file_name = "Liste des étudiants master"
-        elif program == "licence":
-            file_name = "Liste des étudiants licence"
+    if not program or program not in ["master", "licence"]:
+        return Response({"message" : "program is required"}, status=400)
+    
+    if program == "master":
+        file_name = "Liste des étudiants master"
+    elif program == "licence":
+        file_name = "Liste des étudiants licence"
     file_name += ".xls"
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="' + file_name + '"'
@@ -204,7 +208,10 @@ def students_data(request):
     row_num = 0
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
-    columns = ['Nom', 'Prénom', 'CIN', 'Nationalité', 'Ville', 'Date de naissance', 'Téléphone', 'Adresse', 'Code Massar', 'Type de bac', 'Année de bac', 'Note de bac', 'Département', 'Filière', "email", "Date d'inscription"]
+    if program == "licence":
+        columns = ['Nom', 'Prénom', 'CIN', 'Nationalité', 'Ville', 'Date de naissance', 'Téléphone', 'Adresse', 'Code Massar', 'Type de bac', 'Année de bac', 'Note de bac', 'Département', 'Filière', "email", "Date d'inscription"]
+    else:
+        columns = ['Nom', 'Prénom', 'CIN', 'Nationalité', 'Ville', 'Date de naissance', 'Téléphone', 'Adresse', 'Code Massar', 'Type de bac', 'Licence', 'Année de Licence', 'Note de Licence', 'Département', 'Filière', "email", "Date d'inscription"]
     for col_num in range(len(columns)):
         ws.write(row_num, col_num, columns[col_num], font_style)
     font_style = xlwt.XFStyle()
@@ -216,22 +223,29 @@ def students_data(request):
         
     for student in students:
         row_num += 1
-        ws.write(row_num, 0, student.first_name, font_style)
-        ws.write(row_num, 1, student.last_name, font_style)
-        ws.write(row_num, 2, student.cin, font_style)
-        ws.write(row_num, 3, student.nationality, font_style)
-        ws.write(row_num, 4, student.city, font_style)
-        ws.write(row_num, 5, student.date_of_birth, font_style)
-        ws.write(row_num, 6, student.phone, font_style)
-        ws.write(row_num, 7, student.address, font_style)
-        ws.write(row_num, 8, student.codeMassar, font_style)
-        ws.write(row_num, 9, student.bac_type, font_style)
-        ws.write(row_num, 10, student.diplome_year, font_style)
-        ws.write(row_num, 11, student.diplome_note, font_style)
-        ws.write(row_num, 12, student.departement, font_style)
-        ws.write(row_num, 13, student.filiere, font_style)
-        ws.write(row_num, 14, student.user.email, font_style)
-        ws.write(row_num, 15, format_datetime(student.user.created_at), font_style)
+        cols = []
+        cols.append(student.first_name)
+        cols.append(student.last_name)
+        cols.append(student.cin)
+        cols.append(student.nationality)
+        cols.append(student.city)
+        cols.append(str(student.date_of_birth))
+        cols.append(student.phone)
+        cols.append(student.address)
+        cols.append(student.codeMassar)
+        cols.append(student.bac_type)
+        if program == "master":
+            cols.append(student.licence_name)
+        cols.append(student.diplome_year)
+        cols.append(student.diplome_note)
+        cols.append(student.departement)
+        cols.append(student.filiere)
+        cols.append(student.user.email)
+        cols.append(format_datetime(student.user.created_at))
+        for col_num in range(len(cols)):
+            ws.write(row_num, col_num, cols[col_num], font_style)
+        wb.save(response)
+       
     wb.save(response)
     return response
 

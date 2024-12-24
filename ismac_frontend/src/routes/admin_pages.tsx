@@ -366,10 +366,14 @@ export function AdminListPage({ type }: { type: "oral" | "ecrit" }) {
           <button
             onClick={() => {
               // rootUrl + "students/data/"
-
+              const program = searchParams.get("program");
+              if (!program ||["licence", "master"].indexOf(program) === -1) {
+                alert("Veuillez choisir un programme");
+                return;
+              }
               let url = rootUrl + "students/data/";
-              if (searchParams.get("program")) {
-                url += `?program=${searchParams.get("program")}`;
+              if (program) {
+                url += `?program=${program}`;
               }
               // just open the url in a new tab
               window.open(url, "_blank");

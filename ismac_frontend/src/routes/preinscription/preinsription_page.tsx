@@ -201,6 +201,22 @@ export function PreInscriptionPage() {
       }
     } else if (step === "bac_informations") {
       for (const fieldName in bacFormData) {
+        if(fieldName === "diplome_year") {
+          if(bacFormData.diplome_year === "") {
+            setBacErrors((prev) => ({
+              ...prev,
+              [fieldName]: "Ce champ est requis",
+            }));
+            isGood = false;
+          }
+          if (bacFormData.diplome_year.split("-").length !== 2 || bacFormData.diplome_year.split("-")[0].length !== 4 || bacFormData.diplome_year.split("-")[1].length !== 4) {
+            setBacErrors((prev) => ({
+              ...prev,
+              [fieldName]: "Année invalide (format: 0000-0000)",
+            }));
+            isGood = false;
+          }
+        }
         if (fieldName === "licence_name") {
           if (
             (bacFormData.is_master === true &&
