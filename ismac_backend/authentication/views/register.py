@@ -244,7 +244,7 @@ def students_data(request):
         cols.append(format_datetime(student.user.created_at))
         for col_num in range(len(cols)):
             ws.write(row_num, col_num, cols[col_num], font_style)
-        wb.save(response)
+        # wb.save(response)
        
     wb.save(response)
     return response
